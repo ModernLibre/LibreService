@@ -1,9 +1,16 @@
-use serde::Serialize;
+use chrono::NaiveDate;
+use diesel::{Insertable, Queryable, Selectable};
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize)]
+use crate::schema::book;
+#[derive(Debug, Serialize, Deserialize, Queryable, Insertable, Selectable)]
+#[diesel(table_name = book)]
 pub struct Book {
-    pub id: u32,
+    pub id: i32,
     pub title: String,
     pub author: String,
-    pub rating: f32,
+    pub rating: f64,
+    pub status: i32,
+    pub description: String,
+    pub added_date: NaiveDate,
 }
