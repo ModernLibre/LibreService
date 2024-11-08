@@ -7,6 +7,8 @@ use crate::schema::book;
 #[diesel(table_name = book)]
 pub struct Book {
     pub id: i32,
+    pub file_url: String,
+    pub cover_url: String,
     pub title: String,
     pub author: String,
     pub rating: f64,
