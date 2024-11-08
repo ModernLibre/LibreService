@@ -14,5 +14,7 @@ diesel = { version = "2", features = ["postgres", "r2d2", "uuid", "chrono"] }
 uuid = "0.8"
 derive_more = "0.99.17"
 chrono = { version = "0.4", features = ["serde"] }
+actix-multipart = "0.7.2"
+epub = "2.1.2"
 [dev-dependencies]
 actix-rt = "2.5"
