@@ -13,3 +13,17 @@ table! {
         added_date -> Date,
     }
 }
+
+table! {
+    chapter (id) {
+        id -> Int4,
+        title -> Varchar,
+        index -> Int4,
+        content -> Text,
+        level -> Int4,
+        parent_id -> Int4,
+        book_id -> Int4,
+        created_time -> Date,
+        updated_time -> Date,
+    }
+}
