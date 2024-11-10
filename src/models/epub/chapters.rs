@@ -10,7 +10,7 @@ pub struct Chapter {
     pub id: i32,
     pub title: String,
     pub index: i32,
-    pub content: String,
+    pub content_index: i32,
     pub level: i32,
     pub parent_id: i32,
     pub book_id: i32,

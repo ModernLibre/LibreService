@@ -48,17 +48,6 @@ CREATE TABLE SUBSCRIPTION (
     PRIMARY KEY (userId, readingListId)
 );
 
-CREATE TABLE chapters (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    index INT NOT NULL,
-    content TEXT NOT NULL,
-    level INT NOT NULL,
-    parent_id INT,
-    book_id INT REFERENCES BOOK(id),
-    created_time DATE ,
-    updated_time DATE
-);
 
 -- Insert test data
 INSERT INTO BOOK (title, author, description, status, rating, addedDate) VALUES

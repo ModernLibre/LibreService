@@ -25,7 +25,6 @@ impl Epub {
         // 读取文件内容到 epub_buffer
         data_stream.file.file.read_to_end(&mut epub_buffer)
             .map_err(|err| Box::new(err)).unwrap();
-        
         // 创建 Cursor 并从中读取 EpubDoc
         let cursor = std::io::Cursor::new(epub_buffer);
         let epub_doc = EpubDoc::from_reader(cursor).unwrap();
@@ -45,14 +44,15 @@ impl Epub {
     /// value: (PathBuf: 章节文件路径; String: 章节名)
     fn init_catalog(data: &EpubDoc<Cursor<Vec<u8>>>) -> BTreeMap<usize, (PathBuf, String)> {
         let toc = &data.toc;
-        let mut key: usize = 0;
+        //章节号默认从1开始
+        let mut key: usize = 1;
         let mut catalog = BTreeMap::new();
 
         for item in toc {
             catalog.insert(key, (item.content.clone(), item.label.clone()));
+            //log::info!("content:{:?}", item.content);
             key += 1;
         }
-        
         return catalog
     }
 
@@ -61,20 +61,22 @@ impl Epub {
     /// key: 章节索引
     /// value: 资源索引
     fn init_resource_mapping(data: &EpubDoc<Cursor<Vec<u8>>>, catalog: &BTreeMap<usize, (PathBuf, String)>) -> BTreeMap<usize, usize>{
-        let mut index: usize = 0;
+        //页号默认从1开始
+        let mut index: usize = 1;
         let mut spine = BTreeMap::new();
 
-        // path -> index -> catalog_item_content
+        // 资源序列表 content -> index(页号)
         for content_name in &data.spine {
             let (path, _) = &data.resources.get(content_name).unwrap();
             spine.insert(path.clone(), index);
             index += 1;
         }
 
+        //目录要找到自己的页号,例子：目录3对应的开始页号为11
         catalog
         .iter()
         .map(|(index, (path, _))| {
-            let resource_index = spine.get(path).unwrap();
+            let resource_index = spine.get(&get_path_without_fragment(&path)).unwrap();
             (index.clone(), resource_index.clone())
         })
         .collect::<BTreeMap<usize, usize>>()
@@ -112,30 +114,22 @@ pub fn get_catalog_name(epub: &mut Epub) -> Vec<String> {
     .collect::<Vec<String>>()
 }
 
-pub fn get_catalog_contents(epub: &mut Epub) -> Vec<Vec<u8>> {
-    let len = epub.resources_mapping.len();
-    let mut result = Vec::new();
-    for index in 0..len {
-        let rescourse_index = epub.resources_mapping.get(&index).unwrap();
-        let cur_catalog_content = epub.data.get_resource_by_path(epub.data.spine[*rescourse_index].clone()).unwrap();
-        result.push(cur_catalog_content);
-    }
-    result
-}
-
-// epub 文件解析
-pub async fn epub_parse(epub: &mut  Epub) -> Vec<Chapter> {
+// epub 文件目录解析
+pub fn epub_parse(epub: &mut  Epub) -> Vec<Chapter> {
+    log::debug!("epub parse start!");
     let len = epub.catalog.len();
+    log::debug!("catalog len: {}", len);
     let mut result = Vec::new();
     let chapter_names = get_catalog_name(epub);
-    let chapter_contents = get_catalog_contents(epub);
+
+
     for index in 0..len {
-        let content = String::from_utf8(chapter_contents[index].clone()).unwrap_or_else(|_| String::from("Invalid UTF-8"));
+        let content_index = *epub.resources_mapping.get(&(index + 1)).clone().unwrap() as i32;
         let chapter = Chapter {
-            id: uuid::Uuid::new_v4().as_u128() as i32,
+            id: 0,
             title: chapter_names[index].clone(),
             index: index.clone() as i32,
-            content,
+            content_index: content_index,
             level: 0,
             parent_id: 0,
             book_id: 0,
@@ -145,6 +139,15 @@ pub async fn epub_parse(epub: &mut  Epub) -> Vec<Chapter> {
         result.push(chapter);  
     }
     result
+}
+
+fn get_path_without_fragment(path: &PathBuf) -> PathBuf {
+    if let Some(path_str) = path.to_str() {
+        if let Some((path_without_fragment, _)) = path_str.split_once('#') {
+            return PathBuf::from(path_without_fragment);
+        }
+    }
+    path.clone()
 }
 
 pub async fn save_cover() {

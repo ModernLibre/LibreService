@@ -1,5 +1,5 @@
 use actix_web::{web::Data, App, HttpServer};
-use diesel::{r2d2, PgConnection};
+use diesel::{r2d2, MysqlConnection, PgConnection};
 use dotenv::dotenv;
 use libre_service::routes::init_routes;
 use std::env;
@@ -15,7 +15,8 @@ async fn main() -> std::io::Result<()> {
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     log::debug!("Starting server");
     // create db connection pool
-    let manager = r2d2::ConnectionManager::<PgConnection>::new(database_url);
+    // let manager = r2d2::ConnectionManager::<PgConnection>::new(database_url);
+    let manager = r2d2::ConnectionManager::<MysqlConnection>::new(database_url);
     let pool = r2d2::Pool::builder()
         .build(manager)
         .expect("Failed to create pool.");
