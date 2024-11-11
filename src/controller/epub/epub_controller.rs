@@ -2,9 +2,9 @@ use actix_multipart::form::{tempfile::TempFile, MultipartForm};
 use actix_web::{web, HttpResponse};
 use diesel::{r2d2::{self, ConnectionManager}, MysqlConnection, PgConnection, RunQueryDsl};
 
-use crate::{error::ServiceError, models::epub::{epub::{epub_parse, Epub}, recourses::{Resource, Resources}}, schema};
-// type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
-type DbPool = r2d2::Pool<ConnectionManager<MysqlConnection>>;
+use crate::{error::ServiceError, models::epub::{chapters::Chapters, epub::{epub_parse_chapters, Epub}, recourses::{Resource, Resources}}, schema};
+type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
+//type DbPool = r2d2::Pool<ConnectionManager<MysqlConnection>>;
 #[derive(Debug, MultipartForm)]
 pub struct UploadForm {
     pub file: TempFile,
@@ -15,11 +15,11 @@ pub async fn epub_upload(db_pool: web::Data<DbPool>, payload: MultipartForm<Uplo
     let mut epub_object = Epub::new(payload);
     //log::debug!("get epub file: {:?}", epub_object.get_title());
     //使用epub对象初始化章节内容表
-    let chapters = epub_parse(&mut epub_object);
-    log::debug!("chapter parse success!, len:{}", chapters.len());
+    let chapters = Chapters::init(&mut epub_object).await.chapters;
+    //log::debug!("chapter parse success!, len:{}", chapters.len());
     //使用epub对象初始化资源表
-    let recources = Resources::init(epub_object.data.clone()).get_resources();
-    log::debug!("recources parse success!, len:{}", recources.len());
+    let recources = Resources::init(&mut epub_object).await.resources;
+    //log::debug!("recources parse success!, len:{}", recources.len());
 
     // 尝试建立数据库连接
     let mut conn = db_pool.get().map_err(|e| {

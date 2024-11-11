@@ -1,6 +1,6 @@
 USE epubTest;
 
-CREATE TABLE chapter (
+CREATE TABLE IF NOT EXISTS chapter (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     `index` INT NOT NULL,
@@ -10,4 +10,9 @@ CREATE TABLE chapter (
     book_id INT,
     created_time DATE ,
     updated_time DATE
+);
+
+CREATE TABLE IF NOT EXISTS recources (
+    `index` SERIAL PRIMARY KEY,
+    content TEXT NOT NULL
 );

@@ -5,7 +5,7 @@ use epub::doc::EpubDoc;
 
 use crate::controller::epub::epub_controller::UploadForm;
 
-use super::chapters::Chapter;
+use super::{chapters::Chapter, recourses::Resource};
 
 pub struct Epub {
     // data
@@ -105,6 +105,15 @@ impl Epub {
         }
         css_list
     }
+
+    pub fn get_spine(&self) -> Vec<String> {
+        self.data.spine.clone()
+    }
+
+    pub fn get_resources(&self) -> HashMap<String, (PathBuf, String)> {
+        self.data.resources.clone()
+    }
+
 }
 
 pub fn get_catalog_name(epub: &mut Epub) -> Vec<String> {
@@ -115,7 +124,7 @@ pub fn get_catalog_name(epub: &mut Epub) -> Vec<String> {
 }
 
 // epub 文件目录解析
-pub fn epub_parse(epub: &mut  Epub) -> Vec<Chapter> {
+pub fn epub_parse_chapters(epub: &mut  Epub) -> Vec<Chapter> {
     log::debug!("epub parse start!");
     let len = epub.catalog.len();
     log::debug!("catalog len: {}", len);
@@ -139,6 +148,25 @@ pub fn epub_parse(epub: &mut  Epub) -> Vec<Chapter> {
         result.push(chapter);  
     }
     result
+}
+
+pub fn epub_parse_resources(epub: &mut Epub) -> Vec<Resource>{
+    let mut index = 1;
+    let mut resources = Vec::new();
+    let spine = epub.get_spine();
+    let epub_rescources = epub.get_resources();
+    for content_name in spine {
+        let (path, _) = epub_rescources.get(&content_name).unwrap();
+        let content = epub.data.get_resource_str_by_path(path).unwrap().clone();
+        let recourse = Resource {
+            index: index,
+            content,
+        };
+        resources.push(recourse);
+        index += 1;
+    }
+
+    return resources
 }
 
 fn get_path_without_fragment(path: &PathBuf) -> PathBuf {
