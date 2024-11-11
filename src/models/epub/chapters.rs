@@ -1,5 +1,8 @@
 use chrono::NaiveDate;
-use diesel::{prelude::{Insertable, Queryable}, Selectable};
+use diesel::{
+    prelude::{Insertable, Queryable},
+    Selectable,
+};
 use serde::{Deserialize, Serialize};
 
 use crate::schema::chapter;
@@ -15,5 +18,5 @@ pub struct Chapter {
     pub parent_id: i32,
     pub book_id: i32,
     pub created_time: NaiveDate,
-    pub updated_time: NaiveDate
+    pub updated_time: NaiveDate,
 }
