@@ -189,3 +189,57 @@ pub async fn save_book_info() {
 pub async fn save_recourse() {
     todo!()
 }
+
+pub fn get_catalog_name(epub: &mut Epub) -> Vec<String> {
+    epub.catalog
+    .iter()
+    .map(|(_, (_, name))| name.clone())
+    .collect::<Vec<String>>()
+}
+
+pub fn get_catalog_contents(epub: &mut Epub) -> Vec<Vec<u8>> {
+    let len = epub.resources_mapping.len();
+    let mut result = Vec::new();
+    for index in 0..len {
+        let rescourse_index = epub.resources_mapping.get(&index).unwrap();
+        let cur_catalog_content = epub.data.get_resource_by_path(epub.data.spine[*rescourse_index].clone()).unwrap();
+        result.push(cur_catalog_content);
+    }
+    result
+}
+
+// epub 文件解析
+pub async fn epub_parse(epub: &mut  Epub) -> Vec<Chapter> {
+    let len = epub.catalog.len();
+    let mut result = Vec::new();
+    let chapter_names = get_catalog_name(epub);
+    let chapter_contents = get_catalog_contents(epub);
+    for index in 0..len {
+        let content = String::from_utf8(chapter_contents[index].clone()).unwrap_or_else(|_| String::from("Invalid UTF-8"));
+        let chapter = Chapter {
+            id: uuid::Uuid::new_v4().as_u128() as i32,
+            title: chapter_names[index].clone(),
+            index: index.clone() as i32,
+            content,
+            level: 0,
+            parent_id: 0,
+            book_id: 0,
+            created_time: chrono::Local::now().naive_local().date(),
+            updated_time: chrono::Local::now().naive_local().date()
+        };
+        result.push(chapter);  
+    }
+    result
+}
+
+pub async fn save_cover() {
+    todo!()
+}
+
+pub async fn save_book_info() {
+    todo!()
+}
+
+pub async fn save_recourse() {
+    todo!()
+}

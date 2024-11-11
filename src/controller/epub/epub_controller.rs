@@ -20,7 +20,6 @@ pub async fn epub_upload(db_pool: web::Data<DbPool>, payload: MultipartForm<Uplo
     //使用epub对象初始化资源表
     let recources = Resources::init(&mut epub_object).await.resources;
     //log::debug!("recources parse success!, len:{}", recources.len());
-
     // 尝试建立数据库连接
     let mut conn = db_pool.get().map_err(|e| {
         log::error!("获取数据库连接失败:{}", e);

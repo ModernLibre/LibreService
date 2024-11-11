@@ -48,7 +48,6 @@ CREATE TABLE SUBSCRIPTION (
     PRIMARY KEY (userId, readingListId)
 );
 
-
 -- Insert test data
 INSERT INTO BOOK (title, author, description, status, rating, addedDate) VALUES
 ('Book One', 'Author One', 'Description One', 1, 4.5, '2023-01-01'),
