@@ -2,6 +2,7 @@ use actix_web::{error::ResponseError, HttpResponse};
 use derive_more::Display;
 use diesel::result::{DatabaseErrorKind, Error as DBError};
 use serde::Serialize;
+use std::error::Error;
 use uuid::Error as ParseError;
 
 #[derive(Debug, Display, Serialize)]
@@ -16,7 +17,7 @@ pub enum ServiceError {
     Unauthorized,
 }
 
-// impl ResponseError trait allows to convert our errors into http responses with appropriate data
+// 实现 `ResponseError` 以便将错误转换为 HTTP 响应
 impl ResponseError for ServiceError {
     fn error_response(&self) -> HttpResponse {
         match self {
@@ -29,18 +30,21 @@ impl ResponseError for ServiceError {
     }
 }
 
-// we can return early in our handlers if UUID provided by the user is not valid
-// and provide a custom message
+// 为 `ServiceError` 实现 `Send + Sync` 特性
+impl Error for ServiceError {}
+unsafe impl Send for ServiceError {}
+unsafe impl Sync for ServiceError {}
+
+// 将 ParseError 转换为 ServiceError
 impl From<ParseError> for ServiceError {
     fn from(_: ParseError) -> ServiceError {
         ServiceError::BadRequest("Invalid UUID".into())
     }
 }
 
+// 将 diesel 的 DBError 转换为 ServiceError
 impl From<DBError> for ServiceError {
     fn from(error: DBError) -> ServiceError {
-        // Right now we just care about UniqueViolation from diesel
-        // But this would be helpful to easily map errors as our app grows
         match error {
             DBError::DatabaseError(kind, info) => {
                 if let DatabaseErrorKind::UniqueViolation = kind {
@@ -51,5 +55,12 @@ impl From<DBError> for ServiceError {
             }
             _ => ServiceError::InternalServerError,
         }
+    }
+}
+
+// 添加从 Box<dyn std::error::Error> 到 ServiceError 的转换
+impl From<Box<dyn std::error::Error>> for ServiceError {
+    fn from(_: Box<dyn std::error::Error>) -> ServiceError {
+        ServiceError::InternalServerError
     }
 }

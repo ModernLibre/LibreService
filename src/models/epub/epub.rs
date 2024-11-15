@@ -1,4 +1,8 @@
-use std::{collections::{BTreeMap, HashMap}, io::{Cursor, Read}, path::PathBuf};
+use std::{
+    collections::{BTreeMap, HashMap},
+    io::{Cursor, Read},
+    path::PathBuf,
+};
 
 use actix_multipart::form::MultipartForm;
 use epub::doc::EpubDoc;
@@ -21,11 +25,15 @@ pub struct Epub {
 impl Epub {
     pub fn new(mut data_stream: MultipartForm<UploadForm>) -> Self {
         let mut epub_buffer = Vec::new();
-    
+
         // 读取文件内容到 epub_buffer
-        data_stream.file.file.read_to_end(&mut epub_buffer)
-            .map_err(|err| Box::new(err)).unwrap();
-        
+        data_stream
+            .file
+            .file
+            .read_to_end(&mut epub_buffer)
+            .map_err(|err| Box::new(err))
+            .unwrap();
+
         // 创建 Cursor 并从中读取 EpubDoc
         let cursor = std::io::Cursor::new(epub_buffer);
         let epub_doc = EpubDoc::from_reader(cursor).unwrap();
@@ -40,7 +48,7 @@ impl Epub {
     }
 
     /// 初始化目录结构
-    /// 
+    ///
     /// key: 章节索引
     /// value: (PathBuf: 章节文件路径; String: 章节名)
     fn init_catalog(data: &EpubDoc<Cursor<Vec<u8>>>) -> BTreeMap<usize, (PathBuf, String)> {
@@ -52,15 +60,18 @@ impl Epub {
             catalog.insert(key, (item.content.clone(), item.label.clone()));
             key += 1;
         }
-        
-        return catalog
+
+        return catalog;
     }
 
     /// 初始化目录向资源的映射
-    /// 
+    ///
     /// key: 章节索引
     /// value: 资源索引
-    fn init_resource_mapping(data: &EpubDoc<Cursor<Vec<u8>>>, catalog: &BTreeMap<usize, (PathBuf, String)>) -> BTreeMap<usize, usize>{
+    fn init_resource_mapping(
+        data: &EpubDoc<Cursor<Vec<u8>>>,
+        catalog: &BTreeMap<usize, (PathBuf, String)>,
+    ) -> BTreeMap<usize, usize> {
         let mut index: usize = 0;
         let mut spine = BTreeMap::new();
 
@@ -72,13 +83,12 @@ impl Epub {
         }
 
         catalog
-        .iter()
-        .map(|(index, (path, _))| {
-            let resource_index = spine.get(path).unwrap();
-            (index.clone(), resource_index.clone())
-        })
-        .collect::<BTreeMap<usize, usize>>()
-
+            .iter()
+            .map(|(index, (path, _))| {
+                let resource_index = spine.get(path).unwrap();
+                (index.clone(), resource_index.clone())
+            })
+            .collect::<BTreeMap<usize, usize>>()
     }
 
     pub fn get_title(&self) -> String {
@@ -88,7 +98,7 @@ impl Epub {
     pub fn get_author(&self) -> String {
         self.data.mdata("author").unwrap()
     }
-    
+
     /// 获取Epub的css
     ///
     /// 返回一个HashMap<String, Vec<u8>>
@@ -107,9 +117,9 @@ impl Epub {
 
 pub fn get_catalog_name(epub: &mut Epub) -> Vec<String> {
     epub.catalog
-    .iter()
-    .map(|(_, (_, name))| name.clone())
-    .collect::<Vec<String>>()
+        .iter()
+        .map(|(_, (_, name))| name.clone())
+        .collect::<Vec<String>>()
 }
 
 pub fn get_catalog_contents(epub: &mut Epub) -> Vec<Vec<u8>> {
@@ -117,20 +127,24 @@ pub fn get_catalog_contents(epub: &mut Epub) -> Vec<Vec<u8>> {
     let mut result = Vec::new();
     for index in 0..len {
         let rescourse_index = epub.resources_mapping.get(&index).unwrap();
-        let cur_catalog_content = epub.data.get_resource_by_path(epub.data.spine[*rescourse_index].clone()).unwrap();
+        let cur_catalog_content = epub
+            .data
+            .get_resource_by_path(epub.data.spine[*rescourse_index].clone())
+            .unwrap();
         result.push(cur_catalog_content);
     }
     result
 }
 
 // epub 文件解析
-pub async fn epub_parse(epub: &mut  Epub) -> Vec<Chapter> {
+pub async fn epub_parse(epub: &mut Epub) -> Vec<Chapter> {
     let len = epub.catalog.len();
     let mut result = Vec::new();
     let chapter_names = get_catalog_name(epub);
     let chapter_contents = get_catalog_contents(epub);
     for index in 0..len {
-        let content = String::from_utf8(chapter_contents[index].clone()).unwrap_or_else(|_| String::from("Invalid UTF-8"));
+        let content = String::from_utf8(chapter_contents[index].clone())
+            .unwrap_or_else(|_| String::from("Invalid UTF-8"));
         let chapter = Chapter {
             id: uuid::Uuid::new_v4().as_u128() as i32,
             title: chapter_names[index].clone(),
@@ -140,9 +154,9 @@ pub async fn epub_parse(epub: &mut  Epub) -> Vec<Chapter> {
             parent_id: 0,
             book_id: 0,
             created_time: chrono::Local::now().naive_local().date(),
-            updated_time: chrono::Local::now().naive_local().date()
+            updated_time: chrono::Local::now().naive_local().date(),
         };
-        result.push(chapter);  
+        result.push(chapter);
     }
     result
 }

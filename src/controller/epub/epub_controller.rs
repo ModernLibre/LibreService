@@ -1,15 +1,25 @@
 use actix_multipart::form::{tempfile::TempFile, MultipartForm};
 use actix_web::{web, HttpResponse};
-use diesel::{r2d2::{self, ConnectionManager}, PgConnection, RunQueryDsl};
+use diesel::{
+    r2d2::{self, ConnectionManager},
+    PgConnection, RunQueryDsl,
+};
 
-use crate::{error::ServiceError, models::epub::epub::{epub_parse, Epub}, schema};
+use crate::{
+    error::ServiceError,
+    models::epub::epub::{epub_parse, Epub},
+    schema,
+};
 type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
 #[derive(Debug, MultipartForm)]
 pub struct UploadForm {
     pub file: TempFile,
 }
 
-pub async fn epub_upload(db_pool: web::Data<DbPool>, payload: MultipartForm<UploadForm>) -> Result<HttpResponse, ServiceError> {
+pub async fn epub_upload(
+    db_pool: web::Data<DbPool>,
+    payload: MultipartForm<UploadForm>,
+) -> Result<HttpResponse, ServiceError> {
     //TODO: 调用FileService upload接口上传epub文件至s3, 并获得url
     let mut epub_object = Epub::new(payload);
     //使用epub对象初始化章节内容表
