@@ -16,7 +16,8 @@ export default defineConfig({
       {
         text: 'Api',
         items: [
-          { text: 'Authentication', link: '/auth_api' },
+          // { text: 'Authentication', link: '/auth_api' },
+          { text: 'Authentication', link: '/' },
           { text: 'User', link: '/user_api' }
         ]
       }
