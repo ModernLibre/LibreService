@@ -26,6 +26,7 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/ModernLibre/LibreService' }
     ]
   },
+  base: '/LibreService/',
   rewrites: {
     'auth_api.md': 'index.md',
     // 'auth_api.md': 'auth_api.md'
