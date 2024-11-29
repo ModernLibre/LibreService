@@ -138,26 +138,29 @@ pub async fn top_rated_books(
 }
 
 // 接收File Service 传回的书本信息
-pub async fn upload_book_info(db_pool: web::Data<DbPool>, book_: Json<Book>) -> Result<HttpResponse, ServiceError> {
+pub async fn upload_book_info(
+    db_pool: web::Data<DbPool>,
+    book_: Json<Book>,
+) -> Result<HttpResponse, ServiceError> {
     //log::debug!("get book info: {:?}", book);
-let book = book_.into_inner();
-// 将book信息插入数据库
-let mut conn = db_pool
-                    .get()
-                    .map_err(|_| ServiceError::InternalServerError)?;
+    let book = book_.into_inner();
+    // 将book信息插入数据库
+    let mut conn = db_pool
+        .get()
+        .map_err(|_| ServiceError::InternalServerError)?;
 
-let ans = web::block(move|| {
-    diesel::insert_into(crate::schema::book::table)
-        .values(&book)
-        .execute(&mut conn)
-        .map_err(ServiceError::from)
-})
-.await
-.map_err(|_| ServiceError::InternalServerError)?;
+    let ans = web::block(move || {
+        diesel::insert_into(crate::schema::book::table)
+            .values(&book)
+            .execute(&mut conn)
+            .map_err(ServiceError::from)
+    })
+    .await
+    .map_err(|_| ServiceError::InternalServerError)?;
 
-Ok(HttpResponse::Ok().json(BaseResponse {
-    data: ans,
-    message: "Success".to_string(),
-    status: 200,
-}))
+    Ok(HttpResponse::Ok().json(BaseResponse {
+        data: ans,
+        message: "Success".to_string(),
+        status: 200,
+    }))
 }
