@@ -1,6 +1,7 @@
 use crate::error::ServiceError;
 use crate::models::book::Book;
 use crate::models::common::BaseResponse;
+use actix_web::web::Json;
 use actix_web::{web, HttpResponse};
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
@@ -131,6 +132,34 @@ pub async fn top_rated_books(
 
     Ok(HttpResponse::Ok().json(BaseResponse {
         data: books,
+        message: "Success".to_string(),
+        status: 200,
+    }))
+}
+
+// 接收File Service 传回的书本信息
+pub async fn upload_book_info(
+    db_pool: web::Data<DbPool>,
+    book_: Json<Book>,
+) -> Result<HttpResponse, ServiceError> {
+    //log::debug!("get book info: {:?}", book);
+    let book = book_.into_inner();
+    // 将book信息插入数据库
+    let mut conn = db_pool
+        .get()
+        .map_err(|_| ServiceError::InternalServerError)?;
+
+    let ans = web::block(move || {
+        diesel::insert_into(crate::schema::book::table)
+            .values(&book)
+            .execute(&mut conn)
+            .map_err(ServiceError::from)
+    })
+    .await
+    .map_err(|_| ServiceError::InternalServerError)?;
+
+    Ok(HttpResponse::Ok().json(BaseResponse {
+        data: ans,
         message: "Success".to_string(),
         status: 200,
     }))

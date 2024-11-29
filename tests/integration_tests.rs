@@ -6,7 +6,7 @@ async fn test_list_books() {
     let mut app = test::init_service(App::new().configure(init_routes)).await;
     let req = test::TestRequest::post()
         .uri("/books/list")
-        .set_json(&serde_json::json!({
+        .set_json(serde_json::json!({
             "page": 1,
             "size": 10
         }))
