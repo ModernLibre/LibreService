@@ -13,24 +13,3 @@ table! {
         added_date -> Date,
     }
 }
-
-table! {
-    chapter (id) {
-        id -> Int4,
-        title -> Varchar,
-        index -> Int4,
-        content_index -> Int4,
-        level -> Int4,
-        parent_id -> Int4,
-        book_id -> Int4,
-        created_time -> Date,
-        updated_time -> Date,
-    }
-}
-
-table! {
-    recources (index) {
-        index -> Int4,
-        content -> Text,
-    }
-}
