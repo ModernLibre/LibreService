@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: app-config-dev
+  namespace: dev
 data:
   KUBERNETES_SERVICE: "true"
   RUST_LOG: debug
