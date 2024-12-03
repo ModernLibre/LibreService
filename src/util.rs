@@ -7,6 +7,17 @@ pub fn abs_path(path: &str) -> Result<String, Box<dyn std::error::Error>> {
     Ok(absolute_path.to_str().unwrap().to_string())
 }
 
+// wrap a blocking function in a actix-web thread
+pub async fn run_blocking<F, T>(f: F) -> Result<T, crate::error::ServiceError>
+where
+    F: FnOnce() -> T + Send + 'static,
+    T: Send + 'static,
+{
+    actix_web::web::block(f)
+        .await
+        .map_err(|_| crate::error::ServiceError::InternalServerError)
+}
+
 /// 根据本地/集群环境加载不同的环境变量
 pub fn load_env() {
     // 检查环境变量中的 KUBERNETES_SERVICE 标志位
