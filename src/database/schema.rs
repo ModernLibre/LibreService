@@ -1,5 +1,5 @@
-use diesel::{table, QueryDsl};
 use chrono::NaiveDate;
+use diesel::table;
 use diesel::{Insertable, Queryable, Selectable};
 use serde::{Deserialize, Serialize};
 

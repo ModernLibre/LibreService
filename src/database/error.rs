@@ -15,7 +15,7 @@ impl From<BlockingError> for ServiceError {
 
 impl From<diesel::result::Error> for ServiceError {
     fn from(error: diesel::result::Error) -> ServiceError {
-        use diesel::result::{Error, DatabaseErrorKind};
+        use diesel::result::{DatabaseErrorKind, Error};
         match error {
             Error::DatabaseError(kind, info) => {
                 if let DatabaseErrorKind::UniqueViolation = kind {

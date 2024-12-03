@@ -11,9 +11,8 @@ mod list;
 
 #[inline]
 pub fn book_config(cfg: &mut web::ServiceConfig) {
-    let middleware = 
-        actix_web_httpauth::middleware::HttpAuthentication::bearer(
-            crate::casdoor::parse_jwt);
+    let middleware =
+        actix_web_httpauth::middleware::HttpAuthentication::bearer(crate::casdoor::parse_jwt);
 
     cfg.service(
         web::scope("/books")
@@ -22,8 +21,8 @@ pub fn book_config(cfg: &mut web::ServiceConfig) {
             .service(
                 web::resource("/upload")
                     .wrap(middleware)
-                    .route(web::post().to(upload_book_info))
-            )
+                    .route(web::post().to(upload_book_info)),
+            ),
     );
 }
 

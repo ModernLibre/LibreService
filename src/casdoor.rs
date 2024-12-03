@@ -1,5 +1,5 @@
-use casdoor_rust_sdk::CasdoorConfig;
 use actix_web::{dev::ServiceRequest, Error, HttpMessage};
+use casdoor_rust_sdk::CasdoorConfig;
 
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 
@@ -12,7 +12,8 @@ pub fn create_casdoor_client() -> CasdoorConfig {
 
 lazy_static! {
     static ref config: CasdoorConfig = create_casdoor_client();
-    static ref auth: casdoor_rust_sdk::AuthService<'static> = casdoor_rust_sdk::AuthService::new(&config);
+    static ref auth: casdoor_rust_sdk::AuthService<'static> =
+        casdoor_rust_sdk::AuthService::new(&config);
 }
 
 pub fn casdoor_auth() -> casdoor_rust_sdk::AuthService<'static> {
@@ -23,9 +24,11 @@ pub(crate) async fn validator(
     req: ServiceRequest,
     credentials: BearerAuth,
 ) -> Result<ServiceRequest, Error> {
-    let jwt = auth.get_auth_token(credentials.token().to_string())
+    let jwt = auth
+        .get_auth_token(credentials.token().to_string())
         .map_err(|_| actix_web::error::ErrorUnauthorized("Invalid jwt"))?;
-    let user = casdoor_auth().parse_jwt_token(jwt)
+    let user = casdoor_auth()
+        .parse_jwt_token(jwt)
         .map_err(|_| actix_web::error::ErrorUnauthorized("Invalid jwt"))?;
 
     req.extensions_mut().insert(user);
@@ -37,7 +40,8 @@ pub(crate) async fn parse_jwt(
     req: ServiceRequest,
     credentials: BearerAuth,
 ) -> Result<ServiceRequest, Error> {
-    let user = auth.parse_jwt_token(credentials.token().to_string())
+    let user = auth
+        .parse_jwt_token(credentials.token().to_string())
         .map_err(|_| actix_web::error::ErrorUnauthorized("Invalid jwt"))?;
 
     req.extensions_mut().insert(user);

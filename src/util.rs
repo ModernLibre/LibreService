@@ -10,7 +10,7 @@ where
     F: FnOnce() -> T + Send + 'static,
     T: Send + 'static,
 {
-    actix_web::web::block(move || f())
+    actix_web::web::block(f)
         .await
         .map_err(|_| crate::error::ServiceError::InternalServerError)
 }

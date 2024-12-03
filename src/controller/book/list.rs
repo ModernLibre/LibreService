@@ -1,4 +1,4 @@
-use crate::error::ServiceError::{*, self};
+use crate::error::ServiceError::{self, *};
 use crate::schema::Book;
 use crate::util::run_blocking;
 use actix_web::{web, HttpResponse, Responder};
@@ -37,15 +37,22 @@ impl ListBuilder {
         use crate::schema::book::dsl::*;
         match self.query.as_str() {
             // 沟槽的rust，closure没有泛型
-            "id" => run_blocking(move || {
-                unified_query(self.database_connection, id.desc(), self.limit)
-            }).await?,
-            "recent" => run_blocking(move || {
-                unified_query(self.database_connection, added_date.desc(), self.limit)
-            }).await?,
-            "top-rated" => run_blocking(move || {
-                unified_query(self.database_connection, rating.desc(), self.limit)
-            }).await?,
+            "id" => {
+                run_blocking(move || unified_query(self.database_connection, id.desc(), self.limit))
+                    .await?
+            }
+            "recent" => {
+                run_blocking(move || {
+                    unified_query(self.database_connection, added_date.desc(), self.limit)
+                })
+                .await?
+            }
+            "top-rated" => {
+                run_blocking(move || {
+                    unified_query(self.database_connection, rating.desc(), self.limit)
+                })
+                .await?
+            }
             _ => Err(BadRequest("Invalid query parameter".to_string())),
         }
     }
@@ -58,7 +65,7 @@ pub async fn list(
     let conn = crate::database::get_conn(db_pool).await?;
 
     let list = ListBuilder::new(conn, query.into_inner());
-    
+
     let books = list.make_query().await?;
 
     Ok(HttpResponse::Ok().json(books))
@@ -69,11 +76,11 @@ pub fn unified_query<QueryType>(
     query: QueryType,
     limit: i64,
 ) -> Result<Vec<Book>, ServiceError>
-where 
-    QueryType: diesel::Expression 
-        + diesel::AppearsOnTable<crate::schema::book::table> 
-        + diesel::query_builder::QueryId 
-        + diesel::query_builder::QueryFragment<diesel::pg::Pg>
+where
+    QueryType: diesel::Expression
+        + diesel::AppearsOnTable<crate::schema::book::table>
+        + diesel::query_builder::QueryId
+        + diesel::query_builder::QueryFragment<diesel::pg::Pg>,
 {
     use crate::schema::book::dsl::*;
     book.select(Book::as_select())
