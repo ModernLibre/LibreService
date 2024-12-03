@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config-dev
+data:
+  KUBERNETES_SERVICE: "true"
+  RUST_LOG: debug
+  RUST_BACKTRACE: "1"
+  DATABASE_URL: postgres://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}/${PG_DBNAME}
+  PG_USER: postgres
+  PG_HOST: 172.24.4.114
+  PG_PORT: 5432
+  PG_DBNAME: modernlibre
+  PG_POOL_MAX_SIZE: "20"

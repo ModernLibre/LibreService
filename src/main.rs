@@ -1,19 +1,12 @@
 use actix_web::{web::Data, App, HttpServer};
 use casdoor_rust_sdk::AuthService;
 use diesel::{r2d2, PgConnection};
-use dotenv::dotenv;
-use libre_service::{casdoor::create_casdoor_client, error::ServiceError, routes::init_routes};
+use libre_service::{casdoor::create_casdoor_client, error::ServiceError, routes::init_routes, util};
 use tokio::task;
-
+use util::load_env;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    if dotenv().is_err() {
-        println!("Failed to read .env file");
-    } else {
-        println!(".env file loaded successfully");
-    }
-    std::env::set_var("RUST_LOG", "debug");
-    env_logger::init_from_env(env_logger::Env::new().default_filter_or("debug"));
+    load_env();
 
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     log::debug!("Starting server");
