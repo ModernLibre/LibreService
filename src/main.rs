@@ -1,10 +1,6 @@
 use actix_web::{web::Data, App, HttpServer};
-use casdoor_rust_sdk::AuthService;
 use diesel::{r2d2, PgConnection};
-use libre_service::{
-    casdoor::create_casdoor_client, error::ServiceError, routes::init_routes, util,
-};
-use tokio::task;
+use libre_service::{routes::init_routes, util};
 use util::load_env;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -18,22 +14,6 @@ async fn main() -> std::io::Result<()> {
     let pool = r2d2::Pool::builder()
         .build(manager)
         .expect("Failed to create pool.");
-
-    let authed_user = task::spawn_blocking(|| {
-        // 创建 conf 和 auth_src 实例
-        let conf = create_casdoor_client();
-        let auth_src = AuthService::new(&conf);
-
-        // 获取认证 token 并解析用户信息
-        let token = auth_src
-            .get_auth_token("any_code".to_owned())
-            .map_err(ServiceError::from)?;
-        auth_src.parse_jwt_token(token).map_err(ServiceError::from)
-    })
-    .await
-    .expect("Failed to execute blocking task"); // 处理错误
-
-    log::debug!("Authed User: {:?}", authed_user);
 
     HttpServer::new(move || {
         App::new()
