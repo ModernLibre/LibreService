@@ -2,7 +2,7 @@ use actix_web::{web::Data, App, HttpServer};
 use casdoor_rust_sdk::AuthService;
 use diesel::{r2d2, PgConnection};
 use libre_service::{
-    casdoor::create_casdoor_client_from_env, error::ServiceError, routes::init_routes, util,
+    casdoor::{create_casdoor_client_from_env, load_casdoor}, error::ServiceError, routes::init_routes, util,
 };
 use tokio::task;
 use util::load_env;
@@ -18,7 +18,7 @@ async fn main() -> std::io::Result<()> {
     let pool = r2d2::Pool::builder()
         .build(manager)
         .expect("Failed to create pool.");
-
+    load_casdoor().await;
     HttpServer::new(move || {
         App::new()
             .wrap(actix_cors::Cors::permissive()) // TODO: 使用环境变量配置DisableCors
