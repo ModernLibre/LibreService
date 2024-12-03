@@ -1,8 +1,8 @@
 use chrono::NaiveDate;
+use diesel::table;
 use diesel::{Insertable, Queryable, Selectable};
 use serde::{Deserialize, Serialize};
 
-use crate::schema::book;
 #[derive(Debug, Serialize, Deserialize, Queryable, Insertable, Selectable)]
 #[diesel(table_name = book)]
 pub struct Book {
@@ -15,4 +15,18 @@ pub struct Book {
     pub status: i32,
     pub description: String,
     pub added_date: NaiveDate,
+}
+
+table! {
+    book (id) {
+        id -> Int4,
+        file_url -> Varchar,
+        cover_url -> Varchar,
+        title -> Varchar,
+        author -> Varchar,
+        description -> Text,
+        status -> Int4,
+        rating -> Float8,
+        added_date -> Date,
+    }
 }

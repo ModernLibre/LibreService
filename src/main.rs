@@ -42,7 +42,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .wrap(actix_cors::Cors::permissive())
+            .wrap(actix_cors::Cors::permissive()) // TODO: 使用环境变量配置DisableCors
             .app_data(Data::new(pool.clone())) // 将连接池传递给App
             .configure(init_routes)
     })
