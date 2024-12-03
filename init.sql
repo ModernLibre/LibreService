@@ -3,49 +3,51 @@
 
 -- Create tables
 CREATE TABLE BOOK (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    author VARCHAR(255) NOT NULL,
-    description TEXT,
-    status INT,
-    rating FLOAT,
-    addedDate DATE
+    id SERIAL PRIMARY KEY,  -- 书本 ID
+    title VARCHAR(255) NOT NULL, -- 书本标题
+    author VARCHAR(255) NOT NULL, -- 作者
+    description TEXT,   -- 书本描述
+    status INT, -- 0: Inactive, 1: Active
+    rating FLOAT,   -- 评分
+    added_date DATE,  -- 添加日期
+    file_url VARCHAR(255),  -- 书本文件的 URL
+    cover_url VARCHAR(255)  -- 书本封面的 URL
 );
 
 CREATE TABLE CATEGORY (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+    id SERIAL PRIMARY KEY,  -- 分类 ID
+    name VARCHAR(255) NOT NULL  -- 分类名称
 );
 
 CREATE TABLE BOOKCATEGORY (
-    bookId INT REFERENCES BOOK(id),
-    categoryId INT REFERENCES CATEGORY(id),
-    PRIMARY KEY (bookId, categoryId)
+    book_id INT REFERENCES BOOK(id),    -- 书本 ID
+    category_id INT REFERENCES CATEGORY(id),    -- 分类 ID
+    PRIMARY KEY (book_id, category_id)
 );
 
 CREATE TABLE "USER" (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL
+    id SERIAL PRIMARY KEY,  -- 用户 ID
+    username VARCHAR(255) NOT NULL,   -- 用户名
+    email VARCHAR(255) NOT NULL -- 电子邮件
 );
 
 CREATE TABLE READINGLIST (
-    id SERIAL PRIMARY KEY,
-    userId INT REFERENCES "USER"(id),
-    name VARCHAR(255) NOT NULL,
-    isPublic BOOLEAN
+    id SERIAL PRIMARY KEY,  -- 书单 ID
+    user_id INT REFERENCES "USER"(id),  -- 用户 ID
+    name VARCHAR(255) NOT NULL, -- 书单名称
+    is_public BOOLEAN
 );
 
 CREATE TABLE READINGLISTBOOK (
-    readingListId INT REFERENCES READINGLIST(id),
-    bookId INT REFERENCES BOOK(id),
-    PRIMARY KEY (readingListId, bookId)
+    reading_list_id INT REFERENCES READINGLIST(id), -- 书单 ID
+    book_id INT REFERENCES BOOK(id),    -- 书本 ID
+    PRIMARY KEY (reading_list_id, book_id)
 );
 
 CREATE TABLE SUBSCRIPTION (
-    userId INT REFERENCES "USER"(id),
-    readingListId INT REFERENCES READINGLIST(id),
-    PRIMARY KEY (userId, readingListId)
+    user_id INT REFERENCES "USER"(id),  -- 用户 ID
+    reading_list_id INT REFERENCES READINGLIST(id), -- 书单 ID
+    PRIMARY KEY (user_id, reading_list_id)
 );
 
 CREATE TABLE chapters (
@@ -56,20 +58,20 @@ CREATE TABLE chapters (
     level INT NOT NULL,
     parent_id INT,
     book_id INT REFERENCES BOOK(id),
-    created_time DATE ,
+    created_time DATE,
     updated_time DATE
 );
 
 -- Insert test data
-INSERT INTO BOOK (title, author, description, status, rating, addedDate) VALUES
-('Book One', 'Author One', 'Description One', 1, 4.5, '2023-01-01'),
-('Book Two', 'Author Two', 'Description Two', 1, 4.0, '2023-02-01');
+INSERT INTO BOOK (title, author, description, status, rating, added_date, file_url, cover_url) VALUES
+('Book One', 'Author One', 'Description One', 1, 4.5, '2023-01-01', 'file_url_1', 'cover_url_1'),
+('Book Two', 'Author Two', 'Description Two', 1, 4.0, '2023-02-01', 'file_url_2', 'cover_url_2');
 
 INSERT INTO CATEGORY (name) VALUES
 ('Fiction'),
 ('Non-Fiction');
 
-INSERT INTO BOOKCATEGORY (bookId, categoryId) VALUES
+INSERT INTO BOOKCATEGORY (book_id, category_id) VALUES
 (1, 1),
 (2, 2);
 
@@ -77,14 +79,14 @@ INSERT INTO "USER" (username, email) VALUES
 ('user1', 'user1@example.com'),
 ('user2', 'user2@example.com');
 
-INSERT INTO READINGLIST (userId, name, isPublic) VALUES
+INSERT INTO READINGLIST (user_id, name, is_public) VALUES
 (1, 'Reading List One', TRUE),
 (2, 'Reading List Two', FALSE);
 
-INSERT INTO READINGLISTBOOK (readingListId, bookId) VALUES
+INSERT INTO READINGLISTBOOK (reading_list_id, book_id) VALUES
 (1, 1),
 (2, 2);
 
-INSERT INTO SUBSCRIPTION (userId, readingListId) VALUES
+INSERT INTO SUBSCRIPTION (user_id, reading_list_id) VALUES
 (1, 2),
 (2, 1);
