@@ -1,0 +1,135 @@
+openapi: 3.0.0
+info:
+  title: Libre Service Api V1
+  version: '1.0'
+paths:
+  /books/details/{bookId}:
+    get:
+      summary: Get Metadata
+      description: Get metadata of book with given ID.
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookMeta'
+    post:
+      summary: (Deprecated) Create a New Book
+      description: Create a new book with the provided metadata.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookMeta'
+      responses:
+        '201':
+          description: Book created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookMeta'
+    put:
+      summary: Update Book Metadata
+      description: Update metadata of the book with the given ID.
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookMeta'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookMeta'
+    delete:
+      summary: Delete Book
+      description: Delete the book with the given ID.
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No content
+  /books/list:
+    get:
+      summary: List Books
+      description: If `by` is not specified, then random books are responsed.
+      parameters:
+        - name: by
+          in: query
+          schema:
+            type: string
+            enum: [trend, latest]
+            default: random
+        - name: pagenum
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookMeta'
+components:
+  schemas:
+    BookMeta:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+        title:
+          type: string
+          example: Professional C++
+        author:
+          type: string
+          example: Marc Gregoire
+        description:
+          type: string
+          example: Expand your C++ knowledge quickly and efficiently with this advanced resource
+        status:
+          type: integer
+          example: 0
+        rating:
+          type: number
+          format: float
+          example: 4.5
+        added_date:
+          type: integer
+          example: 1735939200
+          description: 添加时间
+        categories:
+          type: array
+          items:
+            type: string
+          example: [cs, tutorial, c++]
+          description: 书本分类
+        cover_url:
+          type: string
+          example: https://m.media-amazon.com/images/I/81qqfxAlzwL._SL1500_.jpg
+          description: 封面图片URL
