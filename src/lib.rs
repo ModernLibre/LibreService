@@ -5,3 +5,6 @@ pub mod models;
 pub mod routes;
 pub mod schema;
 pub mod util;
+
+#[macro_use]
+extern crate lazy_static;
