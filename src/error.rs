@@ -1,6 +1,5 @@
 use actix_web::{error::ResponseError, HttpResponse};
 use derive_more::Display;
-use diesel::result::{DatabaseErrorKind, Error as DBError};
 use serde::Serialize;
 use std::error::Error;
 use uuid::Error as ParseError;
@@ -39,22 +38,6 @@ unsafe impl Sync for ServiceError {}
 impl From<ParseError> for ServiceError {
     fn from(_: ParseError) -> ServiceError {
         ServiceError::BadRequest("Invalid UUID".into())
-    }
-}
-
-// 将 diesel 的 DBError 转换为 ServiceError
-impl From<DBError> for ServiceError {
-    fn from(error: DBError) -> ServiceError {
-        match error {
-            DBError::DatabaseError(kind, info) => {
-                if let DatabaseErrorKind::UniqueViolation = kind {
-                    let message = info.details().unwrap_or_else(|| info.message()).to_owned();
-                    return ServiceError::BadRequest(message);
-                }
-                ServiceError::InternalServerError
-            }
-            _ => ServiceError::InternalServerError,
-        }
     }
 }
 
