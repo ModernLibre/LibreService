@@ -1,10 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use actix_web::{
-        http, test,
-        web::Data,
-        App,
-    };
+    use actix_web::{http, test, web::Data, App};
     use diesel::{
         r2d2::{self, ConnectionManager, Pool},
         PgConnection,
