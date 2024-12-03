@@ -13,7 +13,7 @@ async fn main() -> std::io::Result<()> {
         println!(".env file loaded successfully");
     }
     std::env::set_var("RUST_LOG", "debug");
-    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("debug"));
 
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     log::debug!("Starting server");

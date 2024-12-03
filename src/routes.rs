@@ -10,9 +10,9 @@ use actix_web::web;
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/api/libre/v1/books")
-            .wrap(actix_web_httpauth::middleware::HttpAuthentication::bearer(
-                validator,
-            ))
+            // .wrap(actix_web_httpauth::middleware::HttpAuthentication::bearer(
+            //     validator,
+            // ))
             .route("/list", web::post().to(list_books))
             .route("/details/{book_id}", web::get().to(get_book_details))
             .route("/recent", web::get().to(recent_books))
