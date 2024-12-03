@@ -37,18 +37,14 @@ mod tests {
         )
         .await;
 
-        let req = test::TestRequest::post()
+        let req = test::TestRequest::get()
             .uri("/api/libre/v1/books/list")
             .insert_header((http::header::CONTENT_TYPE, "application/json"))
             .to_request();
         let resp = test::call_service(&mut app, req).await;
 
+        println!("Response: {:?}", resp);
         assert!(resp.status().is_success());
-        // // 响应状态码
-        // println!("Response Status: {:?}", resp.status());
-        // // 响应体
-        // let body = test::read_body(resp).await;
-        // println!("Response Body: {:?}", body);
     }
 
     #[actix_web::test]
@@ -64,7 +60,7 @@ mod tests {
             .uri("/api/libre/v1/books/details/1")
             .to_request();
         let resp = test::call_service(&mut app, req).await;
-
+        println!("Response: {:?}", resp);
         assert!(resp.status().is_success());
     }
 
@@ -77,9 +73,10 @@ mod tests {
         )
         .await;
         let req = test::TestRequest::get()
-            .uri("/api/libre/v1/books/recent?limit=5")
+            .uri("/api/libre/v1/books/list?by=recent&&?limit=5")
             .to_request();
         let resp = test::call_service(&mut app, req).await;
+        println!("Response: {:?}", resp);
         assert!(resp.status().is_success());
     }
 
@@ -92,7 +89,7 @@ mod tests {
         )
         .await;
         let req = test::TestRequest::get()
-            .uri("/api/libre/v1/books/top-rated?limit=5")
+            .uri("/api/libre/v1/books/list?by=top-rated")
             .to_request();
         let resp = test::call_service(&mut app, req).await;
         assert!(resp.status().is_success());
