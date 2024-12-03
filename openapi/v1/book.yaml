@@ -23,6 +23,12 @@ paths:
     post:
       summary: (Deprecated) Create a New Book
       description: Create a new book with the provided metadata.
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
@@ -79,8 +85,11 @@ paths:
           in: query
           schema:
             type: string
-            enum: [trend, latest]
-            default: random
+            enum:
+              - id
+              - top-rated
+              - recent
+            default: id
         - name: pagenum
           in: query
           schema:
@@ -127,7 +136,10 @@ components:
           type: array
           items:
             type: string
-          example: [cs, tutorial, c++]
+          example:
+            - cs
+            - tutorial
+            - c++
           description: 书本分类
         cover_url:
           type: string
