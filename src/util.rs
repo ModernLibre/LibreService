@@ -23,9 +23,10 @@ pub fn load_env() {
     // 检查环境变量中的 KUBERNETES_SERVICE 标志位
     let is_kubernetes =
         env::var("KUBERNETES_SERVICE").unwrap_or_else(|_| "false".to_string()) == "true";
-
-    // 如果不在 Kubernetes 集群中，则加载 .env 文件，否则默认使用 ConfigMap 和 Secret 注入的环境变量
-    if !is_kubernetes {
+    let is_container = 
+        env::var("CONTAINER").unwrap_or_else(|_| "false".to_string()) == "true";
+    // 如果不在 Kubernetes 集群中也不是容器化部署，则加载 .env 文件，否则默认使用 ConfigMap 和 Secret 注入的环境变量
+    if !is_kubernetes && !is_container {
         if dotenv().is_err() {
             println!("Failed to read .env file");
         } else {
