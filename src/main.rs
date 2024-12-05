@@ -1,10 +1,8 @@
 use actix_web::{web::Data, App, HttpServer};
-use casdoor_rust_sdk::AuthService;
 use diesel::{r2d2, PgConnection};
 use libre_service::{
-    casdoor::{create_casdoor_client_from_env, load_casdoor}, error::ServiceError, routes::init_routes, util,
+    casdoor::load_casdoor, routes::init_routes, util,
 };
-use tokio::task;
 use util::load_env;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
