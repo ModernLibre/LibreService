@@ -3,14 +3,14 @@ version: '3.8'
 services:
   app:
     build: .
-    container_name: modernlibre/libre-service
+    container_name: libre-service
     environment:
       - RUST_LOG=debug
       - RUST_BACKTRACE=1
-      - DATABASE_URL=postgres://postgres:dragonos@172.24.4.114:5432/modernlibre
+      - DATABASE_URL=postgres://postgres:dragonos@172.24.4.193:5432/modernlibre
       - PG_USER=postgres
       - PG_PASSWORD=dragonos
-      - PG_HOST=172.24.4.114
+      - PG_HOST=172.24.4.193
       - PG_PORT=5432
       - PG_DBNAME=modernlibre
       - PG_POOL_MAX_SIZE=20
