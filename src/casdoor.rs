@@ -37,6 +37,7 @@ pub fn casdoor_auth() -> casdoor_rust_sdk::AuthService<'static> {
     casdoor_rust_sdk::AuthService::new(&config)
 }
 
+#[allow(unused)]
 pub(crate) async fn validator(
     req: ServiceRequest,
     credentials: BearerAuth,
@@ -44,7 +45,7 @@ pub(crate) async fn validator(
     let jwt = auth
         .get_auth_token(credentials.token().to_string())
         .map_err(|_| actix_web::error::ErrorUnauthorized("Invalid jwt"))?;
-    let user = casdoor_auth()
+    let user = auth
         .parse_jwt_token(jwt)
         .map_err(|_| actix_web::error::ErrorUnauthorized("Invalid jwt"))?;
 

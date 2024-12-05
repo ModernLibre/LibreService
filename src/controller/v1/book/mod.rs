@@ -10,13 +10,13 @@ type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
 mod list;
 
 #[inline]
-pub fn book_config(cfg: &mut web::ServiceConfig) {
+pub fn service_config(cfg: &mut web::ServiceConfig) {
     let middleware =
         actix_web_httpauth::middleware::HttpAuthentication::bearer(crate::casdoor::parse_jwt);
 
     cfg.service(
         web::scope("/books")
-            .route("/{book_id}", web::get().to(get_book_details))
+            .route("/details/{book_id}", web::get().to(get_book_details))
             .route("/list", web::get().to(list::list))
             .service(
                 web::resource("/upload")

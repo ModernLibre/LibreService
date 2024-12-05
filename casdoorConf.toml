@@ -1,7 +1,7 @@
-endpoint = "http://172.24.4.42:3000"
+endpoint = "http://172.24.4.42/"
 client_id = "636d3b65c0c7ce76e32d"
 client_secret = "44085702fb2cdfd5aa79af0d19b62f536a642529"
-certificate = -----BEGIN CERTIFICATE-----
+certificate = """-----BEGIN CERTIFICATE-----
 MIIE3TCCAsWgAwIBAgIDAeJAMA0GCSqGSIb3DQEBCwUAMCgxDjAMBgNVBAoTBWFk
 bWluMRYwFAYDVQQDEw1jZXJ0LWJ1aWx0LWluMB4XDTI0MTIwMTEyMDA0MVoXDTQ0
 MTIwMTEyMDA0MVowKDEOMAwGA1UEChMFYWRtaW4xFjAUBgNVBAMTDWNlcnQtYnVp
@@ -29,5 +29,5 @@ ENNA7vculZhN3CD08HTZnjaHA835luCUseeNvc0zFHjpGOxD5W+T5GhPE66gdzE9
 IbxoRX8ftMmkj1l8JtRUNxQ1iXW0iexLUtPxiooqjFI6JaxDPYWZ2q/dfSmyg9w5
 eYcvCabhJoaNBqQeboge3F5+fYYhMFF2HjE/SjT2jaP/2DsQDuJwRigibQNwB83F
 NQ==
------END CERTIFICATE-----
+-----END CERTIFICATE-----"""
 org_name = "modern-libre-dev-group"
